@@ -1,14 +1,14 @@
-import { compileImageTemplate } from "../helpers";
+import { compileImageTemplate } from '../helpers'
 
 export default ({
-  templateParams: { fontWeight = "700", fontSize = "128px", ...templateParams },
+  templateParams: { fontWeight = '700', fontSize = '128px', ...templateParams },
   ...params
 }) =>
   compileImageTemplate({
     ...params,
     body: `
       <div class="Content">
-        {{title}}
+        {{{title}}}
       </div>
     `,
     styles: `
@@ -26,4 +26,4 @@ export default ({
       }
     `,
     templateParams
-  });
+  })

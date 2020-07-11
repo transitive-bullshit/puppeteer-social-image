@@ -1,4 +1,4 @@
-import { compileImageTemplate } from "../helpers";
+import { compileImageTemplate } from '../helpers'
 
 export default ({ templateParams, ...params }) =>
   compileImageTemplate({
@@ -7,8 +7,8 @@ export default ({ templateParams, ...params }) =>
       <div class="Content">
         <div class="Content-inner">
           {{#if eyebrow}}<div class="Eyebrow">{{eyebrow}}</div>{{/if}}
-          <h1><strong>{{title}}</strong></h1>
-          {{#if subtitle}}<h2>{{subtitle}}</h2>{{/if}}
+          <h1><strong>{{{title}}}</strong></h1>
+          {{#if subtitle}}<h2>{{{subtitle}}}</h2>{{/if}}
         </div>
       </div>
     `,
@@ -48,4 +48,4 @@ export default ({ templateParams, ...params }) =>
       }
     `,
     templateParams
-  });
+  })
