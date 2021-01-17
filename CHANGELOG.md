@@ -1,3 +1,56 @@
+## [0.8.1](https://github.com/chrisvxd/puppeteer-social-image/compare/v0.8.0...v0.8.1) (2020-06-16)
+
+
+### Bug Fixes
+
+* pass all params to custom templates ([327c4b3](https://github.com/chrisvxd/puppeteer-social-image/commit/327c4b3))
+
+
+
+# [0.8.0](https://github.com/chrisvxd/puppeteer-social-image/compare/v0.7.1...v0.8.0) (2020-06-05)
+
+
+### Features
+
+* support custom image types without using a path ([bb621f7](https://github.com/chrisvxd/puppeteer-social-image/commit/bb621f7))
+
+
+### BREAKING CHANGES
+
+* the default type is now JPEG when not specifying the "output" param
+
+
+
+## [0.7.1](https://github.com/chrisvxd/puppeteer-social-image/compare/v0.7.0...v0.7.1) (2020-05-29)
+
+
+### Bug Fixes
+
+* don't render broken previews for sizes that don't support it ([a8f3aa5](https://github.com/chrisvxd/puppeteer-social-image/commit/a8f3aa5))
+
+
+
+# [0.7.0](https://github.com/chrisvxd/puppeteer-social-image/compare/v0.6.0...v0.7.0) (2020-05-29)
+
+
+### Features
+
+* add instagram sizes ([d2b5797](https://github.com/chrisvxd/puppeteer-social-image/commit/d2b5797))
+* add pinterest size ([d3c652c](https://github.com/chrisvxd/puppeteer-social-image/commit/d3c652c))
+* pass size param to custom templates ([400b1ec](https://github.com/chrisvxd/puppeteer-social-image/commit/400b1ec))
+* support custom sizes ([787a49a](https://github.com/chrisvxd/puppeteer-social-image/commit/787a49a))
+
+
+
+# [0.6.0](https://github.com/chrisvxd/puppeteer-social-image/compare/v0.5.5...v0.6.0) (2020-02-03)
+
+
+### Features
+
+* add logo and refined watermark to basic and article templates. Reduce font size. ([2539a79](https://github.com/chrisvxd/puppeteer-social-image/commit/2539a79))
+
+
+
 ## [0.5.5](https://github.com/chrisvxd/puppeteer-social-image/compare/v0.5.4...v0.5.5) (2020-01-30)
 
 

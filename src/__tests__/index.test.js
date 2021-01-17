@@ -2,9 +2,10 @@ import fs from "fs";
 import tempy from "tempy";
 import renderSocialImage, { setTestMode } from "../index";
 import puppeteer from "puppeteer";
+import FileType from "file-type";
 
 const snapshotConfig = {
-  failureThreshold: 0.015,
+  failureThreshold: 0.025,
   failureThresholdType: "percent",
   dumpDiffToConsole: true
 };
@@ -27,6 +28,62 @@ describe("puppeteer-social-image", () => {
         },
         output: tempPath,
         size: "facebook"
+      });
+
+      const testImage = fs.readFileSync(tempPath);
+
+      expect(testImage).toMatchImageSnapshot(snapshotConfig);
+    });
+
+    it("must use the correct default content type", async () => {
+      const data = await renderSocialImage({
+        templateParams: {
+          title: "Hello, twitter! @chrisvxd"
+        },
+        size: "facebook"
+      });
+
+      const { mime } = await FileType.fromBuffer(data);
+
+      expect(mime).toEqual("image/jpeg");
+    });
+
+    it("must use the correct content type when specified", async () => {
+      const data = await renderSocialImage({
+        templateParams: {
+          title: "Hello, twitter! @chrisvxd"
+        },
+        size: "facebook",
+        type: "png"
+      });
+
+      const { mime } = await FileType.fromBuffer(data);
+
+      expect(mime).toEqual("image/png");
+    });
+
+    it("must infer the content from the path, even when type is specified", async () => {
+      const data = await renderSocialImage({
+        output: tempPath,
+        templateParams: {
+          title: "Hello, twitter! @chrisvxd"
+        },
+        size: "facebook",
+        type: "jpeg"
+      });
+
+      const { mime } = await FileType.fromBuffer(data);
+
+      expect(mime).toEqual("image/png");
+    });
+
+    it("must generate an image with a custom size", async () => {
+      await renderSocialImage({
+        templateParams: {
+          title: "Hello, twitter! @chrisvxd"
+        },
+        output: tempPath,
+        size: "512x512"
       });
 
       const testImage = fs.readFileSync(tempPath);
@@ -119,6 +176,38 @@ describe("puppeteer-social-image", () => {
       //   expect(testImage).toMatchImageSnapshot(snapshotConfig);
       // });
 
+      it("must pass all params to custom templates", async () => {
+        // These params were previously suppressed, causing confusion when creating custom templates
+        const body = `<div style="background: white; font-family: Sigmar One; font-size: 48px;">
+      <p>Name: {{ name }}</p>
+      <p>googleFont: {{googleFont}}</p>
+      <p>fontFamily: {{fontFamily}}</p>
+      <p>unsplashId: {{unsplashId}}</p>
+      <p>unsplashKeywords: {{unsplashKeywords}}</p>
+      <p>size: {{size.width}}x{{size.height}}</p>
+    </div>`;
+
+        const styles = "";
+
+        await renderSocialImage({
+          templateParams: {
+            name: "@chrisvxd",
+            googleFont: "Sigmar One",
+            unsplashKeywords: "cat"
+          },
+          templateBody: body,
+          templateStyles: styles,
+          output: tempPath,
+          compileArgs: {
+            testMode: true // We don't actually need to render googleFont
+          }
+        });
+
+        const testImage = fs.readFileSync(tempPath);
+
+        expect(testImage).toMatchImageSnapshot(snapshotConfig);
+      });
+
       it("must accept background param", async () => {
         await renderSocialImage({
           templateParams: {
@@ -189,11 +278,11 @@ describe("puppeteer-social-image", () => {
         expect(testImage).toMatchImageSnapshot(snapshotConfig);
       });
 
-      it("must accept watermarkUrl param", async () => {
+      it("must accept logo param", async () => {
         await renderSocialImage({
           templateParams: {
             title: "Hello, twitter! @chrisvxd",
-            watermarkUrl: "EXAMPLE.COM"
+            logo: "https://i.imgur.com/L5ujMCQ.png"
           },
           output: tempPath
         });
@@ -203,11 +292,26 @@ describe("puppeteer-social-image", () => {
         expect(testImage).toMatchImageSnapshot(snapshotConfig);
       });
 
-      it("must accept watermarkText param", async () => {
+      it("must accept watermark param", async () => {
         await renderSocialImage({
           templateParams: {
             title: "Hello, twitter! @chrisvxd",
-            watermark: "EXAMPLE.COM"
+            watermark: "example.com"
+          },
+          output: tempPath
+        });
+
+        const testImage = fs.readFileSync(tempPath);
+
+        expect(testImage).toMatchImageSnapshot(snapshotConfig);
+      });
+
+      it("must accept logo and watermark param", async () => {
+        await renderSocialImage({
+          templateParams: {
+            title: "Hello, twitter! @chrisvxd",
+            watermark: "example.com",
+            logo: "https://i.imgur.com/L5ujMCQ.png"
           },
           output: tempPath
         });
@@ -231,6 +335,21 @@ describe("puppeteer-social-image", () => {
 
         expect(testImage).toMatchImageSnapshot(snapshotConfig);
       });
+
+      it("must not generate as a preview image when using an invalid preview size", async () => {
+        await renderSocialImage({
+          templateParams: {
+            title: "Hello, twitter! @chrisvxd"
+          },
+          output: tempPath,
+          size: "ig-story",
+          preview: true
+        });
+
+        const testImage = fs.readFileSync(tempPath);
+
+        expect(testImage).toMatchImageSnapshot(snapshotConfig);
+      });
     });
 
     describe("article Template", () => {
@@ -240,8 +359,12 @@ describe("puppeteer-social-image", () => {
           templateParams: {
             eyebrow: "27 AUGUST / REMOTE",
             title: "What not to do when remote working",
-            unsplashId: "2S4FDh3AtGw"
+            unsplashId: "2S4FDh3AtGw",
+            watermark: "example.com",
+            logo: "https://i.imgur.com/L5ujMCQ.png"
           },
+          size: "facebook",
+
           output: tempPath
         });
 

@@ -6,7 +6,12 @@ import compilePreview from "./helpers/compile-preview";
 
 const sizeMap = {
   facebook: { width: 1200, height: 630 },
-  twitter: { width: 1200, height: 630 }
+  twitter: { width: 1200, height: 630 },
+  "ig-landscape": { width: 1080, height: 608 },
+  "ig-square": { width: 1080, height: 1080 },
+  "ig-portrait": { width: 1080, height: 1350 },
+  "ig-story": { width: 1080, height: 1920 },
+  pinterest: { width: 1000, height: 1500 }
 };
 
 let testMode = false;
@@ -20,7 +25,8 @@ export const setTestMode = val => {
  */
 export default async ({
   jpegQuality = 90,
-  output,
+  output = "",
+  type: userType = "jpeg",
   size = "twitter",
   template = "basic",
   templateParams = {},
@@ -32,7 +38,17 @@ export default async ({
   compileArgs = {}
 }) => {
   // Resolve preferences
-  const _size = sizeMap[size];
+  let _size = sizeMap[size];
+
+  if (!_size) {
+    if (size.indexOf("x") === -1) {
+      throw new Error("Size is invalid");
+    }
+
+    const sizeSplit = size.split("x");
+    _size = { width: parseInt(sizeSplit[0]), height: parseInt(sizeSplit[1]) };
+  }
+
   const { width, height } = _size;
   const customTemplate = customTemplates[template];
   const createTemplate = template && templates[template];
@@ -40,7 +56,11 @@ export default async ({
     .extname(output)
     .slice(1)
     .toLowerCase();
-  const type = ext === "jpg" || ext === "jpeg" ? "jpeg" : "png";
+  const type = output
+    ? ext === "jpg" || ext === "jpeg"
+      ? "jpeg"
+      : "png"
+    : userType;
 
   let browser = userBrowser;
 
@@ -86,12 +106,15 @@ export default async ({
     : createTemplate({
         templateParams,
         size: _size,
+        styles: customStyles,
         compileArgs: { testMode, ...compileArgs }
       });
 
   let screenshot;
 
-  if (!preview) {
+  const validPreviewSizes = ["facebook", "twitter"];
+
+  if (!preview || validPreviewSizes.indexOf(size) === -1) {
     // Wait for fonts to load (via networkidle)
     await page.setContent(html, { waitUntil: "networkidle0" });
 
